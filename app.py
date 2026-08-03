@@ -126,6 +126,30 @@ else:
 
 
 st.divider()
+st.header("Import Transactions")
+
+uploaded_file = st.file_uploader(
+    "Upload a bank CSV file",
+    type=["csv"],
+)
+
+if uploaded_file is not None:
+    import_df = pd.read_csv(uploaded_file)
+
+    st.success("CSV uploaded successfully!")
+
+    st.subheader("Preview")
+    st.dataframe(
+        import_df.head(),
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    st.subheader("Detected Columns")
+    st.write(import_df.columns.tolist())
+
+
+st.divider()
 
 st.header("Add Transaction")
 
