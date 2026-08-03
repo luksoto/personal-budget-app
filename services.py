@@ -100,4 +100,57 @@ def delete_transaction(transaction_id):
             (transaction_id,),
         )
 
-        connection.commit()        
+        connection.commit()     
+
+def get_dashboard_summary():
+
+    with get_connection() as connection:
+
+        cursor = connection.execute("""
+            SELECT
+                SUM(CASE WHEN transaction_type='income'
+                    THEN amount ELSE 0 END) AS income,
+
+                SUM(CASE WHEN transaction_type='expense'
+                    THEN amount ELSE 0 END) AS expenses,
+
+                COUNT(*) AS total_transactions
+
+            FROM transactions
+        """)
+
+        return cursor.fetchone()         
+
+def get_expenses_by_category():
+    with get_connection() as connection:
+        cursor = connection.execute(
+            """
+            SELECT
+                category,
+                SUM(amount) AS total
+            FROM transactions
+            WHERE transaction_type = 'expense'
+            GROUP BY category
+            ORDER BY total DESC
+            """
+        )
+
+        return cursor.fetchall()      
+
+def get_monthly_expenses():
+
+    with get_connection() as connection:
+
+        cursor = connection.execute(
+            """
+            SELECT
+                substr(transaction_date,1,7) AS month,
+                SUM(amount) AS total
+            FROM transactions
+            WHERE transaction_type='expense'
+            GROUP BY month
+            ORDER BY month
+            """
+        )
+
+        return cursor.fetchall()    
